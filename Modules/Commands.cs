@@ -9,7 +9,6 @@ namespace Botkic.Modules
     public class Commands : ModuleBase<SocketCommandContext>
     {
         Random random = new Random();
-        Message lastQuote = null;
 
         [Command("help")]
         public async Task Help()
@@ -56,23 +55,21 @@ namespace Botkic.Modules
                 JsonSerializer serializer = new JsonSerializer();
                 quotes = (Quotes)serializer.Deserialize(file, typeof(Quotes));
             }
-            if (quotes == null) { Console.WriteLine("umu"); }
-            if (quotes.Messages == null) { Console.WriteLine("omo"); }
-
             int randInd = random.Next((int)quotes.MessageCount);
             await ReplyAsync(quotes.Messages[randInd].Content);
-            lastQuote = quotes.Messages[randInd];
+            GlobalVars.lastQuote = quotes.Messages[randInd];
         }
 
         [Command("quoteinfo")]
         public async Task QuoteInfo()
         {
+            Message lastQuote = GlobalVars.lastQuote;
             if (lastQuote == null) {
                 await ReplyAsync("Get a quote with .quote first!");
             }
             else {
                 string result =
-                    "Quote sent by {lastQuote.Author.Name} on {lastQuote.Timestamp.dateTime}.";
+                    $"Quote sent by {lastQuote.Author.Name} on {lastQuote.Timestamp.DateTime}.";
                 await ReplyAsync(result);
             }
         }
