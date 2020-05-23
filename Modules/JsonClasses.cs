@@ -1,6 +1,8 @@
+
 using System;
 using Newtonsoft.Json;
 
+// json classes for discord chat logs obtained using DiscordChatExporter
 public partial class Quotes
 {
     [JsonProperty("messages")]
@@ -34,13 +36,28 @@ public partial class Message
     public Author Author { get; set; }
 
     [JsonProperty("attachments")]
-    public object[] Attachments { get; set; }
+    public Attachment[] Attachments { get; set; }
 
     [JsonProperty("embeds")]
     public object[] Embeds { get; set; }
 
     [JsonProperty("reactions")]
     public Reaction[] Reactions { get; set; }
+}
+
+public partial class Attachment
+{
+    [JsonProperty("id")]
+    public string Id { get; set; }
+
+    [JsonProperty("url")]
+    public string Url { get; set; }
+
+    [JsonProperty("fileName")]
+    public string FileName { get; set; }
+
+    [JsonProperty("fileSizeBytes")]
+    public long FileSizeBytes { get; set; }
 }
 
 public partial class Author
@@ -73,7 +90,7 @@ public partial class Reaction
 public partial class Emoji
 {
     [JsonProperty("id")]
-    public object Id { get; set; }
+    public string Id { get; set; }
 
     [JsonProperty("name")]
     public string Name { get; set; }
@@ -85,77 +102,3 @@ public partial class Emoji
     public Uri ImageUrl { get; set; }
 }
 
-
-/*
-namespace Botkic.Modules
-{
-    public class User
-        {
-            [JsonProperty("id")]
-            public string id { get; }
-            [JsonProperty("name")]
-            public string name { get; }
-            [JsonProperty("discriminator")]
-            public string discriminator { get; }
-            [JsonProperty("isBot")]
-            public bool isBot { get; }
-            [JsonProperty("avatarUrl")]
-            public string avatarUrl { get; } 
-        }
-
-    public class Reaction
-    {
-        public class Emote {
-            [JsonProperty("id")]
-            public object id { get; }
-            [JsonProperty("name")]
-            public string name { get; }
-            [JsonProperty("isAnimated")]
-            public bool isAnimated { get; }
-            [JsonProperty("imageUrl")]
-            public string imageUrl { get; }
-        }
-        [JsonProperty("emoji")]
-        public Emote emoji { get; }
-        [JsonProperty("count")]
-        public int count { get; }
-    }
-
-    public class Message
-    {
-        [JsonProperty("id")]
-        public string id { get; }
-        [JsonProperty("type")]
-        public string type { get; }
-        [JsonProperty("timestamp")]
-        public DateTime timestamp { get; }
-        [JsonProperty("timestampEdited")]
-        public object timestampEdited { get; }
-        [JsonProperty("bool")]
-        public bool isPinned { get; }
-        [JsonProperty("content")]
-        public string content { get; }
-        [JsonProperty("author")]
-        public User author { get; }
-        [JsonProperty("attachments")]
-        public IList<string> attachments { get; }
-        [JsonProperty("embeds")]
-        public IList<string> embeds { get; }
-        [JsonProperty("reactions")]
-        public IList<Reaction> reactions { get; }
-    }
-
-    public class Quotes
-    {
-        [JsonProperty("messages")]
-        public IList<Message> messages { get; }
-        [JsonProperty("messageCount")]
-        public int messageCount { get; }
-    }
-
-    public class Wrapper
-    {
-        [JsonProperty("JsonValues")]
-        public Quotes Quotes { get; }
-    }
-} */

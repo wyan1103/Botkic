@@ -13,7 +13,7 @@ namespace Botkic.Modules
         [Command("help")]
         public async Task Help()
         {
-            await ReplyAsync("Commands: ping, owo, uwu, anone, quote");
+            await ReplyAsync("Commands: ping, owo, uwu, wood, anone, quote, quoteinfo");
         }
 
         [Command("ping")]
@@ -34,6 +34,12 @@ namespace Botkic.Modules
             await ReplyAsync("uwu");
         }
 
+        [Command("wood")]
+        public async Task Wood()
+        {
+            await ReplyAsync("... miss-wood");
+        }
+
         [Command("anone")]
         public async Task Anone()
         {
@@ -50,14 +56,25 @@ namespace Botkic.Modules
         [Command("quote")]
         public async Task Quote()
         {
-            Quotes quotes;
-            using (StreamReader file = File.OpenText(@"./Modules/quotes.json")) {
-                JsonSerializer serializer = new JsonSerializer();
-                quotes = (Quotes)serializer.Deserialize(file, typeof(Quotes));
+            // read from the json file on the first quotes command
+            if (GlobalVars.quotes == null) {
+                using (StreamReader file = File.OpenText(@"./Modules/quotes.json")) {
+                    JsonSerializer serializer = new JsonSerializer();
+                    GlobalVars.quotes = (Quotes)serializer.Deserialize(file, typeof(Quotes));
+                }
             }
-            int randInd = random.Next((int)quotes.MessageCount);
-            await ReplyAsync(quotes.Messages[randInd].Content);
-            GlobalVars.lastQuote = quotes.Messages[randInd];
+            int randInd = random.Next((int)GlobalVars.quotes.MessageCount);
+            Message msg = GlobalVars.quotes.Messages[randInd];
+            // return text, if it exists
+            if (!String.IsNullOrEmpty(msg.Content)) {
+                await ReplyAsync(msg.Content);
+            }
+            // return any attachment (image), if it exists
+            if (!String.IsNullOrEmpty(msg.Attachments[0].Url)) 
+            {
+                await ReplyAsync(msg.Attachments[0].Url);
+            }
+            GlobalVars.lastQuote = msg;
         }
 
         [Command("quoteinfo")]
