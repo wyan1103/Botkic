@@ -39,7 +39,7 @@ namespace Botkic
             _client.Log += Log;
 
             await RegisterCommandsAsync();
-            await _client.LoginAsync(TokenType.Bot, token);
+            await _client.LoginAsync(TokenType.Bot, token.Trim());
             await _client.StartAsync();
             await Task.Delay(-1);
         }
