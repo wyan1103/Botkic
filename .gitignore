@@ -1,1 +1,4 @@
 token.txt
+/bin
+/obj
+/.vscode
