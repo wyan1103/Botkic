@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 
 namespace Botkic
@@ -29,7 +30,7 @@ namespace Botkic
                 .AddSingleton(_commands)
                 .BuildServiceProvider();
 
-            // read the bot's token from token.txt
+            // read the bot's discord token
             string token;
             using (StreamReader sr = new StreamReader("token.txt"))
             {
