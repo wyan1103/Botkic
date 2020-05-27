@@ -101,67 +101,6 @@ namespace Botkic.Modules
             }
         }
 
-        [Command(".. add")]
-        public async Task AddCustomQuote(string identifier, [Remainder]string text) {
-            Dictionary<string, List<string>> dict = GlobalVars.customQuotes;
-            List<string>quotes;
-
-            // initialize the dictionary on the first addition
-            if(GlobalVars.customQuotes == null) {  
-                await ReplyAsync("Please do .load first");
-            }
-            // adding another quote to an existing identifier
-            else if(dict.TryGetValue(identifier, out quotes)) 
-            {
-                quotes.Add(text);
-            }
-            // creating a quote for a new identifier
-            else
-            {
-                List<string> newQuotes = new List<string>();
-                newQuotes.Add(text);
-                dict.Add(identifier, newQuotes);
-            }
-            await ReplyAsync("Added!");
-        }
-
-        // return custom quotes with the command '... *identifier* *quote*', 
-        // where quotes associated with the identifier are chosen randomly
-        [Command("..")]
-        public async Task GetCustomQuote(string identifier) {
-            List<string> quotes;
-            if(GlobalVars.customQuotes != null && 
-               GlobalVars.customQuotes.TryGetValue(identifier, out quotes)) 
-            {
-                string result = quotes[random.Next(quotes.Count)];
-                await ReplyAsync(result);
-            }
-            else
-            {
-                await ReplyAsync($"No quote associated with \"{identifier}\"");
-            }
-        }
-        // convert custom quotes to a json file
-        [Command("save")]
-        public async Task Save() {
-            string json = JsonConvert.SerializeObject(GlobalVars.customQuotes,
-                                                      Formatting.Indented);
-            File.WriteAllText(@"./MessageData/cquotes.json", json);
-            await ReplyAsync("Done!");
-        }
-
-        // load custom quotes from json file
-        [Command("load")]
-        public async Task Load() {
-            using (StreamReader file = File.OpenText(@"./MessageData/cquotes.json"))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                GlobalVars.customQuotes = (Dictionary<string, List<string>>)
-                    serializer.Deserialize (file, typeof(Dictionary<string, List<string>>));
-            }
-            await ReplyAsync("Done!");
-        }
-
         // helper function that returns whether or not a word occurs as an
         // independent word (not a substring) within a message
         public bool IsIndependent(string context, string word) {
