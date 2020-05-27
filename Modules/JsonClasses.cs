@@ -3,13 +3,62 @@ using System;
 using Newtonsoft.Json;
 
 // json classes for discord chat logs obtained using DiscordChatExporter
+
 public partial class Quotes
 {
+    [JsonProperty("guild")]
+    public Guild Guild { get; set; }
+
+    [JsonProperty("channel")]
+    public Channel Channel { get; set; }
+
+    [JsonProperty("dateRange")]
+    public DateRange DateRange { get; set; }
+
     [JsonProperty("messages")]
     public Message[] Messages { get; set; }
 
     [JsonProperty("messageCount")]
     public long MessageCount { get; set; }
+}
+
+public partial class Channel
+{
+    [JsonProperty("id")]
+    public string Id { get; set; }
+
+    [JsonProperty("type")]
+    public string Type { get; set; }
+
+    [JsonProperty("category")]
+    public string Category { get; set; }
+
+    [JsonProperty("name")]
+    public string Name { get; set; }
+
+    [JsonProperty("topic")]
+    public object Topic { get; set; }
+}
+
+public partial class DateRange
+{
+    [JsonProperty("after")]
+    public object After { get; set; }
+
+    [JsonProperty("before")]
+    public object Before { get; set; }
+}
+
+public partial class Guild
+{
+    [JsonProperty("id")]
+    public string Id { get; set; }
+
+    [JsonProperty("name")]
+    public string Name { get; set; }
+
+    [JsonProperty("iconUrl")]
+    public Uri IconUrl { get; set; }
 }
 
 public partial class Message

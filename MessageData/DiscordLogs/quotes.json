@@ -1,4 +1,20 @@
 {
+    "guild": {
+      "id": "657987077484314626",
+      "name": "Wooden Bloc",
+      "iconUrl": "https://cdn.discordapp.com/icons/657987077484314626/267252e93d86514f94362ab237bf4f0d.png"
+    },
+    "channel": {
+      "id": "691668258671165541",
+      "type": "GuildTextChat",
+      "category": "Text Channels",
+      "name": "puzzle-hunt",
+      "topic": null
+    },
+    "dateRange": {
+      "after": null,
+      "before": null
+    },
     "messages": [
       {
         "id": "661400635891122176",
