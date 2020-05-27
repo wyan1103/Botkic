@@ -28,9 +28,9 @@ namespace Botkic.Modules
         public async Task HelpCQuotes()
         {
             await ReplyAsync(@"**Custom Quote Commands: **
- - To add a quote: `quoteadd [identifier] ""[Quote]""`
- - To get a list of quotes: `quotelist [identifier]`
- - To delete a quote: `quotedel [identifier] [index]`
+ - To add a quote: `.quoteadd [identifier] ""[Quote]""`
+ - To get a list of quotes: `.quotelist [identifier]`
+ - To delete a quote: `.quotedel [identifier] [index]`
  - To get a random quote: `... [identifier]`
 ");
         }

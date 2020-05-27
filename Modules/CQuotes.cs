@@ -47,7 +47,7 @@ namespace Botkic.Modules
                 response += "";
                 await ReplyAsync(response);
             } else {
-                await ReplyAsync($"No quotes associated with ...{identifier}");
+                await ReplyAsync($"No quotes associated with {identifier}");
             }
         }
 
@@ -86,7 +86,7 @@ namespace Botkic.Modules
             }
             else
             {
-                await ReplyAsync($"No quote associated with \"{identifier}\"");
+                await ReplyAsync($"No quotes associated with {identifier}");
             }
         }
         
