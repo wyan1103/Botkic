@@ -16,7 +16,29 @@ namespace Botkic.Modules
         [Command("help")]
         public async Task Help()
         {
-            await ReplyAsync("Commands: ping, owo, uwu, wood, anone, quote, quoteinfo");
+            await ReplyAsync(
+                @"**Commands:** ping, owo, uwu, wood, anone, quote, quoteinfo, stats 
+
+ - Use `.help ...` to see custom quote commands
+ - Use `.help stats` for stats syntax"
+            );
+        }
+
+        [Command("help ...")]
+        public async Task HelpCQuotes()
+        {
+            await ReplyAsync(@"**Custom Quote Commands: **
+ - To add a quote: `quoteadd [identifier] ""[Quote]""`
+ - To get a list of quotes: `quotelist [identifier]`
+ - To delete a quote: `quotedel [identifier] [index]`
+ - To get a random quote: `... [identifier]`
+");
+        }
+
+        [Command("help stats")]
+        public async Task HelpStats()
+        {
+            await ReplyAsync(@".stats [keyword] [inclsubstrings=false]");
         }
 
         // respond with ._.
@@ -137,10 +159,9 @@ namespace Botkic.Modules
         // return usage stats for all users of the given substring
         // parameter "substr" will search for all substrings within the logs
         [Command("stats")]
-        public async Task Stats(string substr, string method = "nosubstr")
+        public async Task Stats(string substr, bool inclSubstrings = false)
         {
             var counts = new Dictionary<string, int>();
-            bool inclSubstrings = method.Equals("includesubstrings");
             string[] allLogs = Directory.GetFiles("./MessageData/DiscordLogs", "*.json");
 
             // iterate through all json logs
