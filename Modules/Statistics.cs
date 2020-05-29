@@ -12,6 +12,24 @@ namespace Botkic.Modules
 {
     public class Statistics : ModuleBase<SocketCommandContext>
     {
+        [Command("help stats")][Alias("help leaderboard")]
+        public async Task HelpStats()
+        {
+            await ReplyAsync(@"**Stats and Leaderboard Syntax:** 
+```c
+.stats [keyword] [params] or .leaderboard [keyword] [params=None]
+
+Parameter Options (not case sensitive): 
+ - inclSubstrings 
+ - caseSensitive 
+ - ignoreRepeats 
+ - inclBots
+
+Ex. 
+.stats owo inclBots ignoreRepeats  -->  ""thowo"" and ""owo owo"" both count as one usage
+.leaderboard UwU caseSensitive     -->  ""uwu"" is ignored```");
+        }
+
         // regex matches a word to a given string
         public int MatchWord(string context, string word, bool substr, bool repeats) {
             if (word.Equals("")) return 1;
@@ -109,7 +127,7 @@ Total Occurrences: {total}```";
         }
 
         [Command("leaderboard")]
-        public async Task Leaderboard(string text, [Remainder]string options)
+        public async Task Leaderboard(string text, [Remainder]string options="")
         {
             var counts = GetCounts(text, ParseParams(options));
             var totals = GetCounts("", ParseParams(options));  // total message counts

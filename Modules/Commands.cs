@@ -37,24 +37,6 @@ namespace Botkic.Modules
 ");
         }
 
-        [Command("help stats")][Alias("help leaderboard")]
-        public async Task HelpStats()
-        {
-            await ReplyAsync(@"**Stats and Leaderboard Syntax:** 
-```c
-.stats [keyword] [params] or .leaderboard [keyword] [params]
-
-Parameter Options (not case sensitive):
- - inclBots 
- - inclSubstrings 
- - caseSensitive 
- - ignoreRepeats 
-
-Ex. 
-.stats owo inclbots ignoreRepeats  -->  ""thowo"" and ""owo owo"" both count as one usage
-.leaderboard UwU casesensitive     -->  ""uwu"" is ignored```");
-        }
-
         // respond with ._.
         [Command("ping")]
         public async Task Ping()
