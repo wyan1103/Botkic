@@ -103,7 +103,7 @@ Ex.
         {
             // read from the json file on the first quotes command
             if (GlobalVars.quotes == null) {
-                using (StreamReader file = File.OpenText(@"./MessageData/DiscordLogs/quotes.json")) {
+                using (StreamReader file = File.OpenText(@"./MessageData/BotkicLogs/DiscordLogs/quotes.json")) {
                     JsonSerializer serializer = new JsonSerializer();
                     GlobalVars.quotes = (Quotes)serializer.Deserialize(file, typeof(Quotes));
                 }

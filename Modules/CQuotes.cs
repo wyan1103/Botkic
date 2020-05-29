@@ -95,14 +95,14 @@ namespace Botkic.Modules
         public async Task Save() {
             string json = JsonConvert.SerializeObject(GlobalVars.customQuotes,
                                                       Formatting.Indented);
-            File.WriteAllText(@"./MessageData/cquotes.json", json);
+            File.WriteAllText(@"./MessageData/BotkicLogs/cquotes.json", json);
             await ReplyAsync("Done!");
         }
 
         // load custom quotes from json file
         [Command("load")]
         public async Task Load() {
-            using (StreamReader file = File.OpenText(@"./MessageData/cquotes.json"))
+            using (StreamReader file = File.OpenText(@"./MessageData/BotkicLogs/cquotes.json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 GlobalVars.customQuotes = (Dictionary<string, List<string>>)

@@ -48,7 +48,7 @@ namespace Botkic.Modules
         public Dictionary<string, int> GetCounts(string text, bool[] options) {
             string substr = ParseMsg(text, options[0]);
             var counts = new Dictionary<string, int>();
-            string[] allLogs = Directory.GetFiles("./MessageData/DiscordLogs", "*.json");
+            string[] allLogs = Directory.GetFiles("./MessageData/BotkicLogs/DiscordLogs", "*.json");
 
             // iterate through all json logs
             foreach(string filePath in allLogs) {
