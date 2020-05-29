@@ -3,8 +3,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Discord.Commands;
+using Discord;
 
 namespace Botkic.Modules
 {
@@ -20,7 +22,7 @@ namespace Botkic.Modules
                 @"**Commands:** ping, owo, uwu, wood, anone, quote, quoteinfo, stats 
 
  - Use `.help ...` to see custom quote commands
- - Use `.help stats` for stats syntax"
+ - Use `.help stats` for stats and leaderboard syntax"
             );
         }
 
@@ -35,10 +37,22 @@ namespace Botkic.Modules
 ");
         }
 
-        [Command("help stats")]
+        [Command("help stats")][Alias("help leaderboard")]
         public async Task HelpStats()
         {
-            await ReplyAsync(@".stats [keyword] [inclsubstrings=false]");
+            await ReplyAsync(@"**Stats and Leaderboard Syntax:** 
+```c
+.stats [keyword] [params] or .leaderboard [keyword] [params]
+
+Parameter Options (not case sensitive):
+ - inclBots 
+ - inclSubstrings 
+ - caseSensitive 
+ - ignoreRepeats 
+
+Ex. 
+.stats owo inclbots ignoreRepeats  -->  ""thowo"" and ""owo owo"" both count as one usage
+.leaderboard UwU casesensitive     -->  ""uwu"" is ignored```");
         }
 
         // respond with ._.
@@ -123,84 +137,15 @@ namespace Botkic.Modules
             }
         }
 
-        // helper function that returns whether or not a word occurs as an
-        // independent word (not a substring) within a message
-        public bool IsIndependent(string context, string word) {
-            if (word.Equals("")) return true;
-            int index = context.IndexOf(word);
-            while(index != -1) {
-                bool left = true;
-                bool right = true;
-                if (index > 0) {
-                    left = !Char.IsLetter(context[index-1]);
-                }
-                if (index < context.Length - word.Length) {
-                    right = !Char.IsLetter(context[index + word.Length]);
-                }
-                if (left && right) return true;
-                index = context.IndexOf(word, index + word.Length);
-            }
-            return false;
+        [Command ("github")]
+        public async Task Github() {
+            await ReplyAsync(@"https://github.com/wyan1103/Botkic");
         }
-/*
-        // return usage stats for a single user of the given substring
-        [Command("stats")]
-        public async Task Stats(string username, string text, string method) {
-            string[] logs = Directory.GetFiles("./MessageData/DiscordLogs", "*.json");
-            foreach(string filePath in logs) {
-                Quotes messages;
-                using (StreamReader file = File.OpenText(filePath)) {
-                    JsonSerializer serializer = new JsonSerializer();
-                    messages = (Quotes)serializer.Deserialize(file, typeof(Quotes));
-                }
-            }
-        }
-*/
-        // return usage stats for all users of the given substring
-        // parameter "substr" will search for all substrings within the logs
-        [Command("stats")]
-        public async Task Stats(string substr, bool inclSubstrings = false)
-        {
-            var counts = new Dictionary<string, int>();
-            string[] allLogs = Directory.GetFiles("./MessageData/DiscordLogs", "*.json");
 
-            // iterate through all json logs
-            foreach(string filePath in allLogs) {
-                Quotes logs;
-                using (StreamReader file = File.OpenText(filePath)) {
-                    JsonSerializer serializer = new JsonSerializer();
-                    logs = (Quotes)serializer.Deserialize(file, typeof(Quotes));
-                }
-                // iterate through all messages within a channel 
-                foreach(Message msg in logs.Messages) {
-                    if((inclSubstrings && msg.Content.Contains(substr)) ||  // search for substrings
-                        IsIndependent(msg.Content.ToLower(), substr)) {     // search for indep words
-                        if(counts.ContainsKey(msg.Author.Name)) {
-                            counts[msg.Author.Name]++;
-                        } else {
-                            counts.Add(msg.Author.Name, 1);
-                        }
-                        // Console.WriteLine(msg.Content);
-                    }
-                }
-            }
-            var orderedCounts = counts.OrderBy(kvp => -kvp.Value); // sort usages w/ highest first
-            int total = 0;
-            foreach(KeyValuePair<string, int> entry in counts) {
-                total += entry.Value;
-            }
-
-            string leaderboard = "";
-            for(int i = 0; i < 10; i++) {
-                var (name, num) = orderedCounts.ElementAt(i);
-                leaderboard += $"  {i+1}. {name}: {num}\n";
-            }
-            string q = "\"";
-            string response = $@"```c
-Top 10 statistics for {q}{substr}{q}: 
-{leaderboard}
-Total Occurances: {total}```";
-            await ReplyAsync(response);
+        // used for testing/debugging purposes
+        [Command ("debug")]
+        public async Task Debug() {
+            return;
         }
     }
 }
