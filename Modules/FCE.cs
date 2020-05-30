@@ -134,7 +134,7 @@ namespace Botkic.Modules
         public async Task loadFCE() {
             await ReplyAsync("Loading...");
             var fceDict = new Dictionary<string, List<Entry>>();
-            using (var reader = new StreamReader(@"./MessageData/FCEdata.csv")) {
+            using (var reader = new StreamReader(@"./Modules/FCEdata.csv")) {
                 reader.ReadLine();  // skip first line metadata
                 List<Entry> entries = new List<Entry>();
                 string currentId = "";
