@@ -127,7 +127,7 @@ namespace Botkic.Modules
         // used for testing/debugging purposes
         [Command ("debug")]
         public async Task Debug() {
-            return;
+            Console.WriteLine(GlobalVars.fceData["15150"][0].toString());
         }
     }
 }
