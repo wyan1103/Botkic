@@ -12,7 +12,7 @@ namespace Botkic.Modules
     {
         // adds a new quote to the quotes dictionary
         [Command("quoteadd")]
-        public async Task AddCustomQuote(string identifier, string text) {
+        public async Task AddCustomQuote(string identifier, [Remainder]string text) {
             Dictionary<string, List<string>> dict = GlobalVars.customQuotes;
             List<string> quotes;
 
