@@ -65,7 +65,7 @@ namespace Botkic
             if(msg.Author.IsBot) return;
 
             int argPos = 0;
-            if(msg.HasStringPrefix(".", ref argPos))
+            if(msg.HasStringPrefix(GlobalVars.delimiter, ref argPos))
             {
                 var result = await _commands.ExecuteAsync(context, argPos, _services);
                 if (!result.IsSuccess) Console.WriteLine(result.ErrorReason);

@@ -129,5 +129,13 @@ namespace Botkic.Modules
         public async Task Debug() {
             Console.WriteLine(GlobalVars.fceData["15150"][0].toString());
         }
+
+        [Command ("set debug")]
+        public async Task SetDebug(bool x) {
+            if (x)
+                GlobalVars.delimiter = ("!");
+            else
+                GlobalVars.delimiter = (".");
+        }
     }
 }

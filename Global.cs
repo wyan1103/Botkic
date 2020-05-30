@@ -4,6 +4,7 @@ using System.Collections.Generic;
 // stores all the data gathered by the bot in the current session
 static class GlobalVars
 {
+    public static string delimiter = ".";
     public static Quotes quotes;
     public static Message lastQuote;
     public static Dictionary<string, List<string>> customQuotes;
@@ -19,7 +20,7 @@ public class Entry {
         public string section { get; set; }
         public string professor { get; set; }
         public string courseName { get; set; }
-        public string responses { get; set; }
+        public string responseRate { get; set; }
         public float hrsPerWeek { get; set; }
         public float courseRating { get; set; }
 
@@ -33,7 +34,7 @@ public class Entry {
             section = list[3];
             professor = list[4];
             courseName = list[5];
-            responses = list[6];
+            responseRate = list[6];
             try {
                 hrsPerWeek = float.Parse(list[7]);
             } catch {
