@@ -15,11 +15,11 @@ namespace Botkic.Modules
         [Command("help stats")][Alias("help leaderboard")]
         public async Task HelpStats()
         {
-            await ReplyAsync(@"**Stats and Leaderboard Syntax:** 
-```c
-.stats [keyword] [params] or .leaderboard [keyword] [params=None]
+            await ReplyAsync(@"**Stats and Leaderboard Syntax:** .stats [keywords] [params] or .leaderboard [keyword] [params=None]
 
-Parameter Options (not case sensitive): 
+To search multiple keywords, separate keywords with commas and surround with quotes, e.g. '.stats ""owo, uwu""'
+
+__Parameter Options__ (not case sensitive): 
  - inclSubstrings 
  - caseSensitive 
  - ignoreRepeats 
@@ -27,7 +27,7 @@ Parameter Options (not case sensitive):
 
 Ex. 
 .stats owo inclBots ignoreRepeats  -->  ""thowo"" and ""owo owo"" both count as one usage
-.leaderboard UwU caseSensitive     -->  ""uwu"" is ignored```");
+.leaderboard UwU caseSensitive     -->  ""uwu"" is ignored");
         }
 
         // regex matches a word to a given string
@@ -37,10 +37,15 @@ Ex.
             if(substr){
                 rx = new Regex(word);
             } else {
-                if (!word.StartsWith(":") || !word.EndsWith(":"))
-                    rx = new Regex($@"\b{word}\b");
-                else
-                    rx = new Regex($@"{word}");
+                string rxPattern = "";
+
+                // don't add \b if the string begins/ends with punctuation
+                if (!Char.IsPunctuation(word[0])) 
+                    rxPattern += @"\b";
+                rxPattern += $"{word}";
+                if (!Char.IsPunctuation(word.Last()))
+                    rxPattern += @"\b";
+                rx = new Regex(rxPattern);
             }
             int res =  rx.Matches(context).Count;
             if (repeats && res > 0) return 1;
@@ -54,17 +59,15 @@ Ex.
             if(!caseSensitive) {
                 text = text.ToLower();
             }
-            // gets the :name: portion of an emote
-            MatchEvaluator getName = new MatchEvaluator((Match m) => m.Result("$1"));
             // match emotes by <:name:id> and replace all matches with :name:
+            MatchEvaluator getName = new MatchEvaluator((Match m) => m.Result("$1"));
             string pattern = @"<(:\w*:)\d*>"; 
             string res =  Regex.Replace(text, pattern, getName);
             return res;
         }
 
         // returns an <string:int> dictionary of users to word counts, worted by word
-        public Dictionary<string, int> GetCounts(string text, bool[] options) {
-            string substr = ParseMsg(text, options[0]);
+        public Dictionary<string, int> GetCounts(string[] keywords, bool[] options) {
             var counts = new Dictionary<string, int>();
             string[] allLogs = Directory.GetFiles("./MessageData/BotkicLogs/DiscordLogs", "*.json");
 
@@ -75,15 +78,18 @@ Ex.
                     JsonSerializer serializer = new JsonSerializer();
                     logs = (Quotes)serializer.Deserialize(file, typeof(Quotes));
                 }
-                // iterate through all messages within a channel 
+                // iterate through all keywords and messages within a channel 
                 foreach(Message msg in logs.Messages) {
                     string content = ParseMsg(msg.Content, options[0]);
-                    int matches = MatchWord(content, substr, options[2], options[3]);
-                    if(matches > 0 && (options[1] || !msg.Author.IsBot)) {
-                        if(counts.ContainsKey(msg.Author.Name)) { 
-                            counts[msg.Author.Name] += matches;
-                        } else {
-                            counts.Add(msg.Author.Name, matches);
+                    foreach(string word in keywords) {
+                        string substr = ParseMsg(word, options[0]);
+                        int matches = MatchWord(content, substr, options[2], options[3]);
+                        if(matches > 0 && (options[1] || !msg.Author.IsBot)) {
+                            if(counts.ContainsKey(msg.Author.Name)) { 
+                                counts[msg.Author.Name] += matches;
+                            } else {
+                                counts.Add(msg.Author.Name, matches);
+                            }
                         }
                     }
                 }
@@ -107,7 +113,8 @@ Ex.
         [Command("stats")]
         public async Task Stats(string text, [Remainder] string options="")
         {
-            var counts = GetCounts(text, ParseParams(options));
+            string[] keywords = text.Split(",");
+            var counts = GetCounts(keywords, ParseParams(options));
             var orderedCounts = counts.OrderBy(kvp => -kvp.Value);  // sort usages w/ highest first
             
             int total = 0;
@@ -128,9 +135,11 @@ Total Occurrences: {total}```";
 
         [Command("leaderboard")]
         public async Task Leaderboard(string text, [Remainder]string options="")
-        {
-            var counts = GetCounts(text, ParseParams(options));
-            var totals = GetCounts("", ParseParams(options));  // total message counts
+        {   
+            Console.WriteLine(text);
+            string[] keywords = text.Split(",");
+            var counts = GetCounts(keywords, ParseParams(options));
+            var totals = GetCounts(new String[] {""}, ParseParams(options));  // total message counts
             var proportions = new Dictionary<string, float>();
             
             // get total usage and total messages sent

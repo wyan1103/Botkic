@@ -10,6 +10,17 @@ namespace Botkic.Modules
 {
     public class CQuotes : ModuleBase<SocketCommandContext>
     {
+        [Command("help ...")] [Alias("help quotes")]
+        public async Task HelpCQuotes()
+        {
+            await ReplyAsync(@"**Custom Quote Commands: **
+ - To add a quote: `.quoteadd [identifier] ""[Quote]""`
+ - To get a list of quotes: `.quotelist [identifier]`
+ - To delete a quote: `.quotedel [identifier] [index]`
+ - To get a random quote: `... [identifier]`
+");
+        }
+
         // adds a new quote to the quotes dictionary
         [Command("quoteadd")]
         public async Task AddCustomQuote(string identifier, string text) {
