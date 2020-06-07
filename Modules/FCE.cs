@@ -60,7 +60,7 @@ namespace Botkic.Modules
 
 
 
-        [Command("dfce")]
+        [Command("fce")]
         public async Task getFCE(string id, int year=2018) {
             var searchResults = Search(id, true, false, year);
             Console.WriteLine("OWO");
@@ -107,7 +107,7 @@ namespace Botkic.Modules
         }
 
         // one time read from the FCE csv and store in global dictionary
-        [Command("dload fce")]
+        [Command("load fce")]
         public async Task loadFCE() {
             await ReplyAsync("Loading...");
             var fceDict = new Dictionary<string, List<Entry>>();

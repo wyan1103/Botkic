@@ -15,9 +15,9 @@ namespace Botkic.Modules
         [Command("help stats")][Alias("help leaderboard")]
         public async Task HelpStats()
         {
-            await ReplyAsync(@"**Stats and Leaderboard Syntax:** .stats [keywords] [params] or .leaderboard [keyword] [params=None]
+            await ReplyAsync(@"**Stats and Leaderboard Syntax:** .stats [keywords] [params=None] or .leaderboard [keyword] [params=None]
 
-To search multiple keywords, separate keywords with commas and surround with quotes, e.g. '.stats ""owo, uwu""'
+To search multiple keywords, separate keywords with commas and surround with quotes, e.g. `.stats ""owo, uwu""`
 
 __Parameter Options__ (not case sensitive): 
  - inclSubstrings 
