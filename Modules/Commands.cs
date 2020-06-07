@@ -10,7 +10,7 @@ using Discord;
 
 namespace Botkic.Modules
 {
-    public class Commands : ModuleBase<SocketCommandContext>
+    public class BasicCommands : ModuleBase<SocketCommandContext>
     {
         Random random = new Random();
 
@@ -99,7 +99,7 @@ namespace Botkic.Modules
             // return any attachment (image), if it exists
             if (!(msg.Attachments == null || msg.Attachments.Length == 0)) 
             {
-                await ReplyAsync(msg.Attachments[0].Url);
+                await ReplyAsync(msg.Attachments[0].Url.ToString());
             }
             GlobalVars.lastQuote = msg;
         }
@@ -114,7 +114,7 @@ namespace Botkic.Modules
             }
             else {
                 string result =
-                    $"Quote sent by {lastQuote.Author.Name} on {lastQuote.Timestamp.DateTime}.";
+                    $"Quote sent by {lastQuote.Author.Username} on {lastQuote.Timestamp.DateTime}.";
                 await ReplyAsync(result);
             }
         }
@@ -127,8 +127,28 @@ namespace Botkic.Modules
         // used for testing/debugging purposes
         [Command ("debug")]
         public async Task Debug() {
-            Console.WriteLine();
-            await ReplyAsync("UwU");
+            return;
+        }
+
+        // updates message logs
+        [Command ("update")]
+        public async Task Update() {
+            string[] channelNames = {"announcements", "bot-spam", "general", "no-mic", "planning", 
+                                     "puzzle-hunt", "quotes", "requests"};
+            int total = 0;
+            // key is channel name ; value is list of new messages sent in that channel
+            foreach(var kvp in GlobalVars.newMessages) {
+                string channel = channelNames.Contains(kvp.Key) ? kvp.Key : "misc";
+
+                string json = File.ReadAllText($@"./MessageData/BotkicLogs/DiscordLogs/{channel}.json");
+                var data = JsonConvert.DeserializeObject<Quotes>(json);
+                data.Messages.AddRange(kvp.Value);
+                data.MessageCount += kvp.Value.Count;
+                total += kvp.Value.Count;
+                string newJson = JsonConvert.SerializeObject(data, Formatting.Indented);
+                File.WriteAllText($@"./MessageData/BotkicLogs/DiscordLogs/{kvp.Key}.json", newJson);
+            }
+            await ReplyAsync($"Added {total} entries!");
         }
 
         [Command ("set debug")]

@@ -10,7 +10,7 @@ using Discord;
 
 namespace Botkic.Modules
 {
-    public class Statistics : ModuleBase<SocketCommandContext>
+    public class StatisticsCommands : ModuleBase<SocketCommandContext>
     {
         [Command("help stats")][Alias("help leaderboard")]
         public async Task HelpStats()
@@ -85,10 +85,10 @@ Ex.
                         string substr = ParseMsg(word, options[0]);
                         int matches = MatchWord(content, substr, options[2], options[3]);
                         if(matches > 0 && (options[1] || !msg.Author.IsBot)) {
-                            if(counts.ContainsKey(msg.Author.Name)) { 
-                                counts[msg.Author.Name] += matches;
+                            if(counts.ContainsKey(msg.Author.Username)) { 
+                                counts[msg.Author.Username] += matches;
                             } else {
-                                counts.Add(msg.Author.Name, matches);
+                                counts.Add(msg.Author.Username, matches);
                             }
                         }
                     }

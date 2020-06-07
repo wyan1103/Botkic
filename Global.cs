@@ -9,6 +9,7 @@ static class GlobalVars
     public static Message lastQuote;
     public static Dictionary<string, List<string>> customQuotes;
     public static Dictionary<string, List<Entry>> fceData;
+    public static Dictionary<string, List<Message>> newMessages;
 
 }
 

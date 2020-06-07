@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 // json classes for discord chat logs obtained using DiscordChatExporter
@@ -16,7 +17,7 @@ public partial class Quotes
     public DateRange DateRange { get; set; }
 
     [JsonProperty("messages")]
-    public Message[] Messages { get; set; }
+    public List<Message> Messages { get; set; }
 
     [JsonProperty("messageCount")]
     public long MessageCount { get; set; }
@@ -67,7 +68,7 @@ public partial class Message
     public string Id { get; set; }
 
     [JsonProperty("type")]
-    public string Type { get; set; }
+    public String Type { get; set; }
 
     [JsonProperty("timestamp")]
     public DateTimeOffset Timestamp { get; set; }
@@ -100,22 +101,29 @@ public partial class Attachment
     public string Id { get; set; }
 
     [JsonProperty("url")]
-    public string Url { get; set; }
+    public Uri Url { get; set; }
 
     [JsonProperty("fileName")]
     public string FileName { get; set; }
 
     [JsonProperty("fileSizeBytes")]
     public long FileSizeBytes { get; set; }
+
+    public Attachment(string id, Uri url, string name, long size) {
+        Id = id;
+        Url = url;
+        FileName = name;
+        FileSizeBytes = size;
+    }
 }
 
-public partial class Author
+public partial class Author 
 {
     [JsonProperty("id")]
     public string Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Username { get; set; }
 
     [JsonProperty("discriminator")]
     public string Discriminator { get; set; }
@@ -125,6 +133,14 @@ public partial class Author
 
     [JsonProperty("avatarUrl")]
     public Uri AvatarUrl { get; set; }
+
+    public Author(string id, string username, string discrim, bool isBot, Uri url) {
+        Id = id; 
+        Username = username; 
+        Discriminator = discrim; 
+        IsBot = isBot; 
+        AvatarUrl = url;
+    }
 }
 
 public partial class Reaction
@@ -134,6 +150,11 @@ public partial class Reaction
 
     [JsonProperty("count")]
     public long Count { get; set; }
+
+    public Reaction(Emoji emoji, long count) {
+        Emoji = emoji;
+        Count = count;
+    }
 }
 
 public partial class Emoji

@@ -9,7 +9,7 @@ using Discord.Commands;
 using Discord;
 
 namespace Botkic.Modules
-{    public class FCE : ModuleBase<SocketCommandContext>
+{    public class FCECommands : ModuleBase<SocketCommandContext>
     {
         // searches the FCE data for the relevant statistics, returning null if the id doesn't
         // match any course id, ("None", name) if there are no statistics for the course, and

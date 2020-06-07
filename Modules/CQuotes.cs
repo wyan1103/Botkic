@@ -8,7 +8,7 @@ using Discord.Commands;
 
 namespace Botkic.Modules
 {
-    public class CQuotes : ModuleBase<SocketCommandContext>
+    public class CQuoteCommands : ModuleBase<SocketCommandContext>
     {
         [Command("help ...")] [Alias("help quotes")]
         public async Task HelpCQuotes()
