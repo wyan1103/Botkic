@@ -102,6 +102,7 @@ namespace Botkic.Modules
         }
         
         // convert custom quotes to a json file
+        [RequireOwner]
         [Command("save")]
         public async Task Save() {
             string json = JsonConvert.SerializeObject(GlobalVars.customQuotes,
@@ -111,6 +112,7 @@ namespace Botkic.Modules
         }
 
         // load custom quotes from json file
+        [RequireOwner]
         [Command("load")]
         public async Task Load() {
             using (StreamReader file = File.OpenText(@"./MessageData/BotkicLogs/cquotes.json"))

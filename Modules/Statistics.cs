@@ -169,13 +169,35 @@ Total Occurrences: {total}```";
             string leaderboard = "";
             for(int i = 0; i < 10 && i < counts.Count; i++) {
                 var (name, num) = orderedProportions.ElementAt(i);
-                leaderboard += $"  {i+1}. {name}: {counts[name]}|{totals[name]}\n";
+                leaderboard += $"  {i+1}. {name}: {counts[name]} uses out of {totals[name]} messages\n";
             }
             string response = $@"```c
 Top 10 relative statistics for ""{text}"": 
 {leaderboard}
-Total Occurrences: {totalCounts}|{totalMsgs}```";
+Total Occurrences: {totalCounts} out of {totalMsgs} messages```";
             await ReplyAsync(response);
+        }
+
+        // updates message logs
+        [RequireOwner]
+        [Command ("update")]
+        public async Task Update() {
+            string[] channelNames = {"announcements", "bot-spam", "general", "no-mic", "planning", 
+                                     "puzzle-hunt", "quotes", "requests"};
+            int total = 0;
+            // key is channel name ; value is list of new messages sent in that channel
+            foreach(var kvp in GlobalVars.newMessages) {
+                string channel = channelNames.Contains(kvp.Key) ? kvp.Key : "misc";
+
+                string json = File.ReadAllText($@"./MessageData/BotkicLogs/DiscordLogs/{channel}.json");
+                var data = JsonConvert.DeserializeObject<Quotes>(json);
+                data.Messages.AddRange(kvp.Value);
+                data.MessageCount += kvp.Value.Count;
+                total += kvp.Value.Count;
+                string newJson = JsonConvert.SerializeObject(data, Formatting.Indented);
+                File.WriteAllText($@"./MessageData/BotkicLogs/DiscordLogs/{kvp.Key}.json", newJson);
+            }
+            await ReplyAsync($"Added {total} entries!");
         }
     }
 }

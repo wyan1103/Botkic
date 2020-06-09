@@ -12,14 +12,13 @@ namespace Botkic.Modules
 {
     public class BasicCommands : ModuleBase<SocketCommandContext>
     {
-        Random random = new Random();
 
         // get a list of available commands
         [Command("help")]
         public async Task Help()
         {
             await ReplyAsync(
-                @"**Commands:** ping, owo, uwu, wood, anone, quote, quoteinfo, stats 
+                @"**Partial List of Commands:** ping, owo, uwu, wood, anone, quote, quoteinfo, quotedelete 
 
  - Use `.help ...` to see custom quote commands
  - Use `.help stats` for stats and leaderboard syntax"
@@ -75,48 +74,9 @@ namespace Botkic.Modules
                 "https://gfycat.com/formalinsignificantalaskanmalamute-hataraku-saibou-platelet",
                 "https://gfycat.com/clumsyexcellentleveret-cell-at-work-animegifs-platelet-applause"
             };
+            Random random = new Random();
             int randInd = random.Next(4);
             await ReplyAsync(options[randInd]);
-        }
-
-        // post a random quote from #quotes
-        [Command("quote")]
-        public async Task Quote()
-        {
-            // read from the json file on the first quotes command
-            if (GlobalVars.quotes == null) {
-                using (StreamReader file = File.OpenText(@"./MessageData/BotkicLogs/DiscordLogs/quotes.json")) {
-                    JsonSerializer serializer = new JsonSerializer();
-                    GlobalVars.quotes = (Quotes)serializer.Deserialize(file, typeof(Quotes));
-                }
-            }
-            int randInd = random.Next((int)GlobalVars.quotes.MessageCount);
-            Message msg = GlobalVars.quotes.Messages[randInd];
-            // return text, if it exists
-            if (!String.IsNullOrEmpty(msg.Content)) {
-                await ReplyAsync(msg.Content);
-            }
-            // return any attachment (image), if it exists
-            if (!(msg.Attachments == null || msg.Attachments.Length == 0)) 
-            {
-                await ReplyAsync(msg.Attachments[0].Url.ToString());
-            }
-            GlobalVars.lastQuote = msg;
-        }
-
-        // get the poster and timestamp of the previous quote
-        [Command("quoteinfo")]
-        public async Task QuoteInfo()
-        {
-            Message lastQuote = GlobalVars.lastQuote;
-            if (lastQuote == null) {
-                await ReplyAsync("Get a quote with .quote first!");
-            }
-            else {
-                string result =
-                    $"Quote sent by {lastQuote.Author.Username} on {lastQuote.Timestamp.DateTime}.";
-                await ReplyAsync(result);
-            }
         }
 
         [Command ("github")]
@@ -127,31 +87,11 @@ namespace Botkic.Modules
         // used for testing/debugging purposes
         [Command ("debug")]
         public async Task Debug() {
-            return;
+            await ReplyAsync("nothing to see here");
         }
 
-        // updates message logs
-        [Command ("update")]
-        public async Task Update() {
-            string[] channelNames = {"announcements", "bot-spam", "general", "no-mic", "planning", 
-                                     "puzzle-hunt", "quotes", "requests"};
-            int total = 0;
-            // key is channel name ; value is list of new messages sent in that channel
-            foreach(var kvp in GlobalVars.newMessages) {
-                string channel = channelNames.Contains(kvp.Key) ? kvp.Key : "misc";
-
-                string json = File.ReadAllText($@"./MessageData/BotkicLogs/DiscordLogs/{channel}.json");
-                var data = JsonConvert.DeserializeObject<Quotes>(json);
-                data.Messages.AddRange(kvp.Value);
-                data.MessageCount += kvp.Value.Count;
-                total += kvp.Value.Count;
-                string newJson = JsonConvert.SerializeObject(data, Formatting.Indented);
-                File.WriteAllText($@"./MessageData/BotkicLogs/DiscordLogs/{kvp.Key}.json", newJson);
-            }
-            await ReplyAsync($"Added {total} entries!");
-        }
-
-        [Command ("set debug")]
+        [RequireOwner]
+        [Command ("reset debug")]
         public async Task SetDebug(bool x) {
             if (x)
                 GlobalVars.delimiter = ("!");
