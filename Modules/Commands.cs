@@ -91,7 +91,7 @@ namespace Botkic.Modules
         }
 
         [RequireOwner]
-        [Command ("reset debug")]
+        [Command ("set debug")]
         public async Task SetDebug(bool x) {
             if (x)
                 GlobalVars.delimiter = ("!");
