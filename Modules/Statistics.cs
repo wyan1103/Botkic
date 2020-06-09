@@ -195,7 +195,7 @@ Total Occurrences: {totalCounts} out of {totalMsgs} messages```";
                 data.MessageCount += kvp.Value.Count;
                 total += kvp.Value.Count;
                 string newJson = JsonConvert.SerializeObject(data, Formatting.Indented);
-                File.WriteAllText($@"./MessageData/BotkicLogs/DiscordLogs/{kvp.Key}.json", newJson);
+                File.WriteAllText($@"./MessageData/BotkicLogs/DiscordLogs/{channel}.json", newJson);
             }
             await ReplyAsync($"Added {total} entries!");
         }
