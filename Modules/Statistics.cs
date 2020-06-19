@@ -10,6 +10,25 @@ using Discord;
 
 namespace Botkic.Modules
 {
+    // modifying options for the stats and leaderboards commands
+    public class StatsOptions
+    {
+        public bool caseSensitive { get; set; }
+        public bool inclBots { get; set; }
+        public bool inclSubstrings { get; set; }
+        public bool ignoreRepeats { get; set; }
+        public bool inclAll {get; set; }
+
+        public StatsOptions(string tokens) {
+            tokens = tokens.ToLower();
+            caseSensitive = tokens.Contains("casesensitive");
+            inclBots = tokens.Contains("inclbots");
+            inclSubstrings = tokens.Contains("inclsubstrings");
+            ignoreRepeats = tokens.Contains("ignorerepeats");
+            inclAll = tokens.Contains("inclall");
+        }
+    }
+
     public class StatisticsCommands : ModuleBase<SocketCommandContext>
     {
         [Command("help stats")][Alias("help leaderboard")]
@@ -66,8 +85,8 @@ Ex.
             return res;
         }
 
-        // returns an <string:int> dictionary of users to word counts, worted by word
-        public Dictionary<string, int> GetCounts(string[] keywords, bool[] options) {
+        // returns an <string:int> dictionary of users to word counts, sorted by word
+        public Dictionary<string, int> GetCounts(string[] keywords, StatsOptions modifiers) {
             var counts = new Dictionary<string, int>();
             string[] allLogs = Directory.GetFiles("./MessageData/BotkicLogs/DiscordLogs", "*.json");
 
@@ -80,11 +99,11 @@ Ex.
                 }
                 // iterate through all keywords and messages within a channel 
                 foreach(Message msg in logs.Messages) {
-                    string content = ParseMsg(msg.Content, options[0]);
+                    string content = ParseMsg(msg.Content, modifiers.caseSensitive);
                     foreach(string word in keywords) {
-                        string substr = ParseMsg(word, options[0]);
-                        int matches = MatchWord(content, substr, options[2], options[3]);
-                        if(matches > 0 && (options[1] || !msg.Author.IsBot)) {
+                        string substr = ParseMsg(word, modifiers.caseSensitive);
+                        int matches = MatchWord(content, substr, modifiers.inclSubstrings, modifiers.ignoreRepeats);
+                        if(matches > 0 && (modifiers.inclBots || !msg.Author.IsBot)) {
                             if(counts.ContainsKey(msg.Author.Username)) { 
                                 counts[msg.Author.Username] += matches;
                             } else {
@@ -97,24 +116,14 @@ Ex.
             return counts;
         }
 
-        // parses optional parameters given for stats/leaderboard commands into a bool array
-        public bool[] ParseParams(string p) {
-            var result = new bool[4];
-            p = p.ToLower();
-            result[0] = p.Contains("casesensitive");
-            result[1] = p.Contains("inclbots");
-            result[2] = p.Contains("inclsubstrings");
-            result[3] = p.Contains("ignorerepeats");
-            return result;
-        }
-
         // return usage stats for all users of the given substring
         // parameter "substr" will search for all substrings within the logs
         [Command("stats")]
         public async Task Stats(string text, [Remainder] string options="")
         {
             string[] keywords = text.Split(",");
-            var counts = GetCounts(keywords, ParseParams(options));
+            StatsOptions modifiers = new StatsOptions(options);
+            var counts = GetCounts(keywords, modifiers);
             var orderedCounts = counts.OrderBy(kvp => -kvp.Value);  // sort usages w/ highest first
             
             int total = 0;
@@ -122,7 +131,8 @@ Ex.
                 total += entry.Value;
             }
             string leaderboard = "";
-            for(int i = 0; i < 10 && i < counts.Count; i++) {
+            int boardSize = modifiers.inclAll ? 13 : 10;
+            for(int i = 0; i < boardSize && i < counts.Count; i++) {
                 var (name, num) = orderedCounts.ElementAt(i);
                 leaderboard += $"  {i+1}. {name}: {num}\n";
             }
@@ -133,13 +143,15 @@ Total Occurrences: {total}```";
             await ReplyAsync(response);
         }
 
+        // returns a leaderboard of messages containing the given substring, by
+        // proportion of total messages
         [Command("leaderboard")]
         public async Task Leaderboard(string text, [Remainder]string options="")
         {   
-            Console.WriteLine(text);
             string[] keywords = text.Split(",");
-            var counts = GetCounts(keywords, ParseParams(options));
-            var totals = GetCounts(new String[] {""}, ParseParams(options));  // total message counts
+            StatsOptions modifiers = new StatsOptions(options);
+            var counts = GetCounts(keywords, modifiers);
+            var totals = GetCounts(new String[] {""}, modifiers);  // total message counts
             var proportions = new Dictionary<string, float>();
             
             // get total usage and total messages sent
@@ -167,7 +179,8 @@ Total Occurrences: {total}```";
 
             // make and outboard the leaderboard
             string leaderboard = "";
-            for(int i = 0; i < 10 && i < counts.Count; i++) {
+            int boardSize = modifiers.inclAll ? 13 : 10;
+            for(int i = 0; i < boardSize && i < counts.Count; i++) {
                 var (name, num) = orderedProportions.ElementAt(i);
                 leaderboard += $"  {i+1}. {name}: {counts[name]} uses out of {totals[name]} messages\n";
             }
@@ -176,6 +189,65 @@ Top 10 relative statistics for ""{text}"":
 {leaderboard}
 Total Occurrences: {totalCounts} out of {totalMsgs} messages```";
             await ReplyAsync(response);
+        }
+
+        // returns an <string:string list> dictionary of users to messages containing the desired token
+        public Dictionary<string, List<string>> GetLogs(string[] keywords, StatsOptions modifiers) {
+            var counts = new Dictionary<string, List<string>>();
+            string[] allLogs = Directory.GetFiles("./MessageData/BotkicLogs/DiscordLogs", "*.json");
+
+            // iterate through all json logs
+            foreach(string filePath in allLogs) {
+                Quotes logs;
+                using (StreamReader file = File.OpenText(filePath)) {
+                    JsonSerializer serializer = new JsonSerializer();
+                    logs = (Quotes)serializer.Deserialize(file, typeof(Quotes));
+                }
+                // iterate through all keywords and messages within a channel 
+                foreach(Message msg in logs.Messages) {
+                    string content = ParseMsg(msg.Content, modifiers.caseSensitive);
+                    foreach(string word in keywords) {
+                        string substr = ParseMsg(word, modifiers.caseSensitive);
+                        int matches = MatchWord(content, substr, modifiers.inclSubstrings, modifiers.ignoreRepeats);
+                        if(matches > 0 && (modifiers.inclBots || !msg.Author.IsBot)) {
+                            if(counts.ContainsKey(msg.Author.Username)) { 
+                                counts[msg.Author.Username].Add(msg.Content);
+                            } else {
+                                var msgList = new List<string>();
+                                msgList.Add(msg.Content);
+                                counts.Add(msg.Author.Username, msgList);
+                            }
+                        }
+                    }
+                }
+            }
+            return counts;
+        }
+
+        // returns a .txt file containing message logs for the given substring
+        [Command("logs")]
+        public async Task Logs(string text, [Remainder]string options="")
+        {   
+            string[] keywords = text.Split(",");
+            StatsOptions modifiers = new StatsOptions(options);
+            var rawLogs = GetLogs(keywords, modifiers);
+            var logs = rawLogs.OrderBy(kvp => -kvp.Value.Count);
+
+            using (StreamWriter file = new StreamWriter($@"./MessageData/Logs.txt")) {
+                file.WriteLine("\n-------------------------------------------------");
+                foreach(var kvp in logs) {
+                    List<string> messages = kvp.Value;
+                    file.WriteLine($"\nUser: {kvp.Key}\nUses: {messages.Count}\n\n*\n");
+                    foreach(var msg in messages) {
+                        file.WriteLine(msg);
+                        file.WriteLine("\n*\n");
+                    }
+                    file.WriteLine("-------------------------------------------------");
+                }
+            }
+
+            var embed = new EmbedBuilder();
+            await Context.Channel.SendFileAsync(@"./MessageData/Logs.txt");
         }
 
         // updates message logs
@@ -197,6 +269,7 @@ Total Occurrences: {totalCounts} out of {totalMsgs} messages```";
                 string newJson = JsonConvert.SerializeObject(data, Formatting.Indented);
                 File.WriteAllText($@"./MessageData/BotkicLogs/DiscordLogs/{channel}.json", newJson);
             }
+            GlobalVars.newMessages = new Dictionary<string, List<Message>>();
             await ReplyAsync($"Added {total} entries!");
         }
     }

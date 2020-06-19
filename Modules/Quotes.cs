@@ -34,7 +34,6 @@ namespace Botkic.Modules
             int tempInd = ind - 1;
             while(tempInd >= 0) {
                 TimeSpan timeDiff = allMsgs[ind].Timestamp - allMsgs[tempInd].Timestamp;
-                Console.WriteLine(timeDiff.TotalMinutes);
                 if (Math.Abs(timeDiff.TotalMinutes) <= 1) 
                     output.Add(allMsgs[tempInd]);
                 else
@@ -49,7 +48,6 @@ namespace Botkic.Modules
             tempInd = ind + 1;
             while(tempInd < allMsgs.Count) {
                 TimeSpan timeDiff = allMsgs[tempInd].Timestamp - allMsgs[ind].Timestamp;
-                Console.WriteLine(timeDiff.TotalMinutes);
                 if (Math.Abs(timeDiff.TotalMinutes) <= 1) 
                     output.Add(allMsgs[tempInd]);
                 else
