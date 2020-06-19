@@ -23,8 +23,8 @@ namespace Botkic.Modules
             tokens = tokens.ToLower();
             caseSensitive = tokens.Contains("casesensitive");
             inclBots = tokens.Contains("inclbots");
-            inclSubstrings = tokens.Contains("inclsubstrings");
-            ignoreRepeats = tokens.Contains("ignorerepeats");
+            inclSubstrings = tokens.Contains("inclsubstring");
+            ignoreRepeats = tokens.Contains("ignorerepeat");
             inclAll = tokens.Contains("inclall");
         }
     }
@@ -42,11 +42,7 @@ __Parameter Options__ (not case sensitive):
  - inclSubstrings 
  - caseSensitive 
  - ignoreRepeats 
- - inclBots
-
-Ex. 
-.stats owo inclBots ignoreRepeats  -->  ""thowo"" and ""owo owo"" both count as one usage
-.leaderboard UwU caseSensitive     -->  ""uwu"" is ignored");
+ - inclBots");
         }
 
         // regex matches a word to a given string
@@ -116,6 +112,12 @@ Ex.
             return counts;
         }
 
+        // pads a string equally on the left and right sides with spaces
+        public string PadStr(string text, int length) {
+            int lenDiff = length - text.Length;
+            return new string (' ', (lenDiff + 1) / 2) + text + new string (' ', lenDiff / 2);
+        }
+
         // return usage stats for all users of the given substring
         // parameter "substr" will search for all substrings within the logs
         [Command("stats")]
@@ -176,14 +178,32 @@ Total Occurrences: {total}```";
             }
             var orderedProportions = proportions.OrderBy(kvp => -kvp.Value); 
 
+            // find the length of the longest username
+            int maxNameLength = 0;
+            foreach(var name in counts.Keys) {
+                int len = name.Length;
+                if (maxNameLength < len) 
+                    maxNameLength = len;
+            }
+
             // make and outboard the leaderboard
-            string leaderboard = "";
+            string leaderboard = $" Rank | {PadStr("Username", maxNameLength)} | Total Uses | Total Msgs | Uses per 1000 Msgs \n";
+            leaderboard += $"------+{new string ('-', maxNameLength + 2)}+------------+------------+--------------------\n";
             for(int i = 0; i < counts.Count; i++) {
                 var (name, num) = orderedProportions.ElementAt(i);
-                leaderboard += $"  {i+1}. {name}: {counts[name]} uses out of {totals[name]} messages\n";
+                float ratio = 1000 * (float) counts[name] / (float) totals[name];
+
+                string rankStr = PadStr((i+1).ToString(), 4);
+                string nameStr = PadStr(name, maxNameLength);
+                string countStr = PadStr(counts[name].ToString(), 10);
+                string totalStr = PadStr(totals[name].ToString(), 10);
+                string ratioStr = PadStr(ratio.ToString("0.00"), 18);
+
+                leaderboard += $" {rankStr} | {nameStr} | {countStr} | {totalStr} | {ratioStr} \n";
             }
             string response = $@"```c
-Top 10 relative statistics for ""{text}"": 
+Usage leaderboard for ""{text}"":
+
 {leaderboard}
 Total Occurrences: {totalCounts} out of {totalMsgs} messages```";
             await ReplyAsync(response);
@@ -235,7 +255,7 @@ Total Occurrences: {totalCounts} out of {totalMsgs} messages```";
                 file.WriteLine("\n-------------------------------------------------");
                 foreach(var kvp in logs) {
                     List<string> messages = kvp.Value;
-                    file.WriteLine($"\nUser: {kvp.Key}\nUses: {messages.Count}\n\n*\n");
+                    file.WriteLine($"\nUser: {kvp.Key}\nMessages: {messages.Count}\n\n*\n");
                     foreach(var msg in messages) {
                         file.WriteLine(msg);
                         file.WriteLine("\n*\n");
