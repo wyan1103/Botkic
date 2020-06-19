@@ -31,10 +31,10 @@ namespace Botkic.Modules
 
     public class StatisticsCommands : ModuleBase<SocketCommandContext>
     {
-        [Command("help stats")][Alias("help leaderboard")]
+        [Command("help stats")][Alias("help leaderboard", "help logs")]
         public async Task HelpStats()
         {
-            await ReplyAsync(@"**Stats and Leaderboard Syntax:** .stats [keywords] [params=None] or .leaderboard [keyword] [params=None]
+            await ReplyAsync(@"**Stats, Leaderboard, and Logs Syntax:** .[stats, logs, leaderboard] [keywords] [params=None]
 
 To search multiple keywords, separate keywords with commas and surround with quotes, e.g. `.stats ""owo, uwu""`
 
@@ -131,8 +131,7 @@ Ex.
                 total += entry.Value;
             }
             string leaderboard = "";
-            int boardSize = modifiers.inclAll ? 13 : 10;
-            for(int i = 0; i < boardSize && i < counts.Count; i++) {
+            for(int i = 0; i < counts.Count; i++) {
                 var (name, num) = orderedCounts.ElementAt(i);
                 leaderboard += $"  {i+1}. {name}: {num}\n";
             }
@@ -179,8 +178,7 @@ Total Occurrences: {total}```";
 
             // make and outboard the leaderboard
             string leaderboard = "";
-            int boardSize = modifiers.inclAll ? 13 : 10;
-            for(int i = 0; i < boardSize && i < counts.Count; i++) {
+            for(int i = 0; i < counts.Count; i++) {
                 var (name, num) = orderedProportions.ElementAt(i);
                 leaderboard += $"  {i+1}. {name}: {counts[name]} uses out of {totals[name]} messages\n";
             }
